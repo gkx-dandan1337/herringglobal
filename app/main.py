@@ -25,14 +25,10 @@ def get_id():
             used_ids.add(id)
             return id
 
-
-
 def find_posts(id):
     for i, p in enumerate(my_posts):
         if p["id"] == id:
             return i, p 
-
-
 
 @app.get("/")
 async def root():
@@ -58,7 +54,7 @@ async def get_post(id:int, response: Response):
         # return {"message": f"post with id {id} was not found"}
     return {"post_detail" : post}
 
-@app.delete("posts/{id}", status_code=status.HTTP_204_NO_CONTENT )
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT )
 async def delete_posts(id:int):
     index, post = find_posts(id) 
     if index:
@@ -67,3 +63,15 @@ async def delete_posts(id:int):
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"this id does not exist.")
     
+
+@app.put("/posts/{id}")
+async def updatepost(id:int, post: Post):
+    index, prev_post = find_posts(id)
+
+    if index:
+        next_post = next_post.model_dump()
+        next_post['id'] = id     
+        my_posts[index] = next_post
+        return {"message" : f"post {id} has been successfully updated. Previous post: {prev_post} Updated post: {next}"}   
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"this id does not exist.")
